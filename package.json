@@ -6,9 +6,11 @@
   "author": "Evan Siegel <evan@grailed.com>",
   "license": "MIT",
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "test": "ava"
   },
   "devDependencies": {
+    "ava": "2.4.0",
     "ts-node": "8.4.1",
     "typescript": "3.7.2"
   }
