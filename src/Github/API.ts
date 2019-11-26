@@ -23,3 +23,5 @@ export const get = <A>(url: string) =>
     baseURL,
     headers,
   });
+
+export const tarURL: string = `${baseURL}/tarball/master?access_token=${token}`;

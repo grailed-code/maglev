@@ -1,6 +1,7 @@
 import { flow } from "fp-ts/lib/function";
 import { right, map } from "fp-ts/lib/TaskEither";
 import { Request } from "../Request";
+import * as Github from "../Github";
 import * as API from "./API";
 
 interface SourceBlob {
@@ -38,7 +39,7 @@ interface CreateParams {
 
 const buildCreateParams = (commitSha: string): CreateParams => ({
   source_blob: {
-    url: "https://github.com/grailed-code/grailed/archive/master.tar.gz",
+    url: Github.API.tarURL,
     version: commitSha,
   },
 });
