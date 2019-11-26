@@ -1,7 +1,8 @@
 /**
  * Function.tap :: (a -> any) -> (a -> a)
  *
- * Given a, probably, side-effect-ful function, `f`, returns a function that takes some argument, `a`, and runs `f` given `a`, ignoring the return value and instead returning `a`.
+ * Given a, probably, side-effect-ful function, `f`, returns a function that takes some argument,
+ * `a`, and runs `f` given `a`, ignoring the return value and instead returning `a`.
  *
  * @example
  *   const log = tap((a) => console.log(a));

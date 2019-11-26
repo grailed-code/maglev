@@ -18,7 +18,8 @@ export interface Bundle {
 /**
  * fromBuildAndSlug :: Tuple Codeship.Build.Build Heroku.Slug.Slug -> TaskEither String Bundle
  *
- * Returns a task of a deploy bundle created from the given Codeship build and Heroku slug. In order to create a bundle, we need three things:
+ * Returns a task of a deploy bundle created from the given Codeship build and Heroku slug. In
+ * order to create a bundle, we need three things:
  *
  * - a set of targets, declared in the environment (for now);
  * - a build from Codeship that we might want to deploy; and
@@ -26,11 +27,16 @@ export interface Bundle {
  *
  * If the Heroku slug does not have a commit, we immediately return a Left of an error message.
  *
- * In Either (and TaskEither), left is traditionally where we put errors. Functions like map, chain, etc. will only operate on the right side of the Either. If we need to map functions over the left side, we can use functions like bimap or mapLeft.
+ * In Either (and TaskEither), left is traditionally where we put errors. Functions like map, chain,
+ * etc. will only operate on the right side of the Either. If we need to map functions over the
+ * left side, we can use functions like bimap or mapLeft.
  *
- * Similarly to the Heroku slug, if the Codeship build doesn't have a commit sha, we immediately return a Left of an error message.
+ * Similarly to the Heroku slug, if the Codeship build doesn't have a commit sha, we immediately
+ * return a Left of an error message.
  *
- * Once we know that we have commit shas from the Heroku slug and the Codeship build, we can make task of a request to get a comparison of those shas from Github. With that task in hand, we can map over it to create a task of the created deploy bundle.
+ * Once we know that we have commit shas from the Heroku slug and the Codeship build, we can make
+ * task of a request to get a comparison of those shas from Github. With that task in hand, we can
+ * map over it to create a task of the created deploy bundle.
  */
 export const fromBuildAndSlug = ([build, slug]: [
   Codeship.Build.Build,
@@ -69,9 +75,11 @@ export const isDeployable = (bundle: Bundle): boolean =>
 /**
  * byQueuedAt :: Ord Bundle
  *
- * This is a way of ordering bundles; specifically, this is a way of ordering bundles by their queued at date (and time).
+ * This is a way of ordering bundles; specifically, this is a way of ordering bundles by their
+ * queued at date (and time).
  *
- * And Ord is an object that has a compare method. Some functions, like Array's sortBy function, expect to be given an Ord or a list of Ords that it can use to do it's work.
+ * And Ord is an object that has a compare method. Some functions, like Array's sortBy function,
+ * expect to be given an Ord or a list of Ords that it can use to do it's work.
  *
  * Read more about Ord here: https://dev.to/gcanti/getting-started-with-fp-ts-ord-5f1e
  */

@@ -37,7 +37,8 @@ export const getById = (appName: string): ((slugId: string) => Request<Slug>) =>
 /**
  * getCurrent :: String -> TaskEither String Slug
  *
- * In order to get the current slug from a Heroku app, we need to get the most recent release. From that release, we can make a second request for a current slug.
+ * In order to get the current slug from a Heroku app, we need to get the most recent release. From
+ * that release, we can make a second request for a current slug.
  */
 export const getCurrent = (appName: string): Request<Slug> =>
   flow(

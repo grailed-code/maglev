@@ -24,7 +24,10 @@ export interface Image {
   alt_text: string;
 }
 
-// NOTE: We aren't using any of the below elements, so I skipped adding their types. If you want to use them, please fill out their types from here: https://api.slack.com/reference/block-kit/block-elements [Evan 2019-11-26]
+// NOTE: We aren't using any of the below elements, so I skipped adding their types. If you want to
+// use them, please fill out their types from here:
+// -> https://api.slack.com/reference/block-kit/block-elements
+// [Evan 2019-11-26]
 
 export interface MultiSelectMenu {}
 

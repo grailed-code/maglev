@@ -38,7 +38,9 @@ const authenticate = () =>
  *
  * Returns a task of an authenticated GET request to the given url of the Codeship API.
  *
- * We include the organization and organization id in the base URL because the two main sections of the Codeship API, Projects and Builds, use the organization prefix on all of their endpoints. Authentication is the only section of the API that doesn't.
+ * We include the organization and organization id in the base URL because the two main sections of
+ * the Codeship API, Projects and Builds, use the organization prefix on all of their endpoints.
+ * Authentication is the only section of the API that doesn't.
  */
 export const get = <A>(url: string) =>
   flow(

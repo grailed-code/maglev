@@ -58,7 +58,8 @@ const buildCreateParams = (commitSha: string): CreateParams => ({
 /**
  * create :: String -> String -> Task String Build
  *
- * A fake implementation of the create function. We'll use this while we test Maglev to make sure that we're not actually deploying.
+ * A fake implementation of the create function. We'll use this while we test Maglev to make sure
+ * that we're not actually deploying.
  */
 export const create = (app: string) => (sha: string): Request<Build> =>
   right({

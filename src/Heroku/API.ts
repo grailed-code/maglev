@@ -8,7 +8,8 @@ const baseURL = "https://api.heroku.com";
 /**
  * get :: (String, ?String) -> TaskEither String (AxiosResponse a)
  *
- * Returns a task of an authenticated GET request to the Heroku API. Optionally, we can pass a Range string that will be used by Heroku to sort or filter the results.
+ * Returns a task of an authenticated GET request to the Heroku API. Optionally, we can pass a
+ * Range string that will be used by Heroku to sort or filter the results.
  */
 export const get = <A>(url: string, range?: string) =>
   request<A>({

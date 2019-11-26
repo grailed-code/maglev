@@ -10,7 +10,8 @@ const projectId = Env.get("CODESHIP_PROJECT_ID");
 /**
  * getAllGreenMasterBuilds :: () -> Request (Array Codeship.Build.Build)
  *
- * Returns a task of an array of all of the Codeship builds that are for the master branch and are successful ("green").
+ * Returns a task of an array of all of the Codeship builds that are for the master branch and are
+ * successful ("green").
  */
 export const getAllGreenMasterBuilds: () => Request<Array<Build.Build>> = flow(
   () => Build.getAll(projectId),
