@@ -33,6 +33,8 @@ export interface Build {
   };
 }
 
+export const isPending = ({ status }: Build): boolean => status === "pending";
+
 interface CreateParams {
   source_blob: SourceBlob;
 }
