@@ -86,3 +86,13 @@ export const create = (app: string) => (sha: string): Request<Build> =>
       id: "fake user",
     },
   });
+
+/**
+ * all :: String -> TaskEither String (Array Build)
+ *
+ * Returns a task of an array of the 30 recent builds for the given Heroku app.
+ */
+export const all = flow(
+  (app: string) => API.get<Array<Build>>(`/apps/${app}/builds`),
+  map((res) => res.data),
+);
