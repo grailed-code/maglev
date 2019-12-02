@@ -84,16 +84,10 @@ const buildsToDeployBundles = (builds: Array<Codeship.Build.Build>) =>
 /**
  * getBestDeployBundle :: Array Deploy.Bundle.Bundle -> TaskEither String Deploy.Bundle.Bundle
  *
- * Given an array of deploy bundles, tries to get the best one to deploy.
- * First, we remove all of the bundles that are not deployable.
- * Then we choose the bundle with the most recent queued at timestamp on its Codeship build.
  * We return a TaskEither to keep it more consistent with the rest of the main function.
  */
 const getBestDeployBundle = flow(
-  Array.filter(Deploy.Bundle.isDeployable),
-  Array.sortBy([Deploy.Bundle.byQueuedAt]),
-  Array.reverse,
-  Array.head,
+  Deploy.getBestBundle,
   TaskEither.fromOption(constant("No deployable builds found.")),
 );
 

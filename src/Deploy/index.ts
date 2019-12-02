@@ -1,4 +1,12 @@
-import { array, map as arrayMap, ap as arrayAp } from "fp-ts/lib/Array";
+import {
+  array,
+  map as arrayMap,
+  ap as arrayAp,
+  filter,
+  sortBy,
+  reverse,
+  head,
+} from "fp-ts/lib/Array";
 import { flow } from "fp-ts/lib/function";
 import {
   TaskEither,
@@ -55,3 +63,17 @@ export const fromBundle = (bundle: Bundle.Bundle): TaskEither<string, Deploy> =>
       builds,
     })),
   )(bundle.targets);
+
+/**
+ * getBestBundle :: Array Bundle -> Option Bundle
+ *
+ * Given an array of deploy bundles, tries to get the best one to deploy.
+ * First, we remove all of the bundles that are not deployable.
+ * Then we choose the bundle with the most recent queued at timestamp on its Codeship build.
+ */
+export const getBestBundle = flow(
+  filter(Bundle.isDeployable),
+  sortBy([Bundle.byQueuedAt]),
+  reverse,
+  head,
+);
