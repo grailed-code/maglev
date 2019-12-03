@@ -6,7 +6,7 @@ export type Request<A> = TaskEither<string, A>;
 const onError = ({ config, message, response }: AxiosError) => {
   const lines: Array<string> = [];
 
-  if (config && config.url) lines.push(config.url);
+  if (config && config.url) lines.push(`${config.method} ${config.url}`);
 
   lines.push(message);
 
