@@ -11,6 +11,11 @@ import * as Notifier from "./Notifier";
 import { zipFill } from "./Tuple.Extra";
 import { log } from "./Logger";
 
+// This is the emergency brake. If it is set to "ENGAGED", it will prevent the train from running.
+if (get("EMERGENCY_BRAKE") === "ENGAGED")
+  throw new Error("🚨 EMERGENCY BRAKE ENGAGED!");
+// Please don't play with the emergency brake. It is not a toy.
+
 const appName = get("HEROKU_APP_NAME");
 
 /**
