@@ -1,5 +1,12 @@
-import { flow } from "fp-ts/lib/function";
-import { right, map } from "fp-ts/lib/TaskEither";
+import { flow, constant, not } from "fp-ts/lib/function";
+import {
+  TaskEither,
+  right,
+  map,
+  chain,
+  fromPredicate,
+} from "fp-ts/lib/TaskEither";
+import { any } from "../Array.Extra";
 import { Request } from "../Request";
 import * as Github from "../Github";
 import * as API from "./API";
@@ -96,3 +103,36 @@ export const all = flow(
   (app: string) => API.get<Array<Build>>(`/apps/${app}/builds`),
   map((res) => res.data),
 );
+
+/**
+ * checkForPendingBuilds :: String -> TaskEither String String
+ *
+ * Checks to see if there are any pending builds for the given app. Returns the given app name in
+ * the right side of the returned TaskEither.
+ *
+ * Here, we have a predicate function, `not(any(isPending))`, which returns true if none of the builds are pending. We use `TaskEither.fromPredicate` to base our return value on the result of the predicate function:
+ *  - if the predicate is true, return the list of builds;
+ *  - if the predicate is false, return the error message.
+ */
+const checkForPendingBuilds = (app: string): TaskEither<string, string> =>
+  flow(
+    all,
+    chain(
+      fromPredicate(
+        not(any(isPending)),
+        constant("There is currently an active build."),
+      ),
+    ),
+    map(constant(app)),
+  )(app);
+
+/**
+ * safelyCreate :: String -> String -> TaskEither String Build
+ *
+ * Calls create after checking to see if there are any currently pending builds for the given app.
+ */
+export const safelyCreate = (app: string) => (sha: string): Request<Build> =>
+  flow(
+    checkForPendingBuilds,
+    chain((app) => create(app)(sha)),
+  )(app);

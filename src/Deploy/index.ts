@@ -55,7 +55,7 @@ export interface Deploy {
  */
 export const fromBundle = (bundle: Bundle.Bundle): TaskEither<string, Deploy> =>
   flow(
-    arrayMap(Heroku.Build.create),
+    arrayMap(Heroku.Build.safelyCreate),
     arrayAp([bundle.codeshipBuild.commit_sha]),
     array.sequence(taskEither),
     taskEitherMap((builds: Array<Heroku.Build.Build>) => ({
