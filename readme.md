@@ -4,6 +4,10 @@ _Safe, smooth, reliable, magnet-powered deployments._
 
 🚄 Maglev is an automated tool for regularly deploying code. It looks at the most recent green master builds in Codeship, compares them to the current slug on Heroku, and finds the best available code to deploy. After the deploy is started, it will post a message in Slack with a list of all of the commits it is deploying.
 
+## Emergency Brake
+
+If you'd like to stop the deploy train from running, you can set the `EMERGENCY_BRAKE` environment variable to `"ENGAGED"`. Any other value, and the train will run.
+
 ## Contributing
 
 ### Installation
