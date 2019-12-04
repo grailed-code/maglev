@@ -7,7 +7,7 @@ import * as Env from "../Env";
 import * as Github from "../Github";
 import * as Heroku from "../Heroku";
 
-const appName = Env.get("HEROKU_APP_NAME");
+const appNames = Env.getArray("HEROKU_APP_NAME");
 
 export interface Bundle {
   targets: Array<string>;
@@ -57,7 +57,7 @@ export const fromBuildAndSlug = ([build, slug]: [
   return flow(
     Github.Comparison.getComparison,
     map((comparison) => ({
-      targets: [appName],
+      targets: appNames,
       comparison,
       codeshipBuild: build,
     })),
