@@ -4,7 +4,7 @@ import { flow, constant } from "fp-ts/lib/function";
 import * as Task from "fp-ts/lib/Task";
 import * as TaskEither from "fp-ts/lib/TaskEither";
 import * as Codeship from "./Codeship";
-import { get } from "./Env";
+import { get, getArray } from "./Env";
 import * as Deploy from "./Deploy";
 import * as Heroku from "./Heroku";
 import * as Notifier from "./Notifier";
@@ -16,7 +16,7 @@ if (get("EMERGENCY_BRAKE") === "ENGAGED")
   throw new Error("🚨 EMERGENCY BRAKE ENGAGED!");
 // Please don't play with the emergency brake. It is not a toy.
 
-const appName = get("HEROKU_APP_NAME");
+const [leader, ...followers] = getArray("HEROKU_APP_NAME");
 
 /**
  * buildAndSlugPairsToDeployBundles :: Array (Tuple Codeship.Build.Build Heroku.Slug.Slug) -> TaskEither String (Array Deploy.Bundle.Bundle)
@@ -84,7 +84,7 @@ const buildsToDeployBundles = (builds: Array<Codeship.Build.Build>) =>
     Heroku.Slug.getCurrent,
     TaskEither.map((slug) => zipFill([builds, slug])),
     TaskEither.chain(buildAndSlugPairsToDeployBundles),
-  )(appName);
+  )(leader);
 
 /**
  * getBestDeployBundle :: Array Deploy.Bundle.Bundle -> TaskEither String Deploy.Bundle.Bundle
