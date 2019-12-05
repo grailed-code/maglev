@@ -1,7 +1,10 @@
 import { flow } from "fp-ts/lib/function";
 import { map } from "fp-ts/lib/TaskEither";
+import { get } from "../Env";
 import { Request } from "../Request";
 import * as API from "./API";
+
+const sourceBranch = get("SOURCE_BRANCH");
 
 export interface Build {
   project_uuid: string | null;
@@ -37,6 +40,6 @@ export const getAll: (projId: string) => Request<Array<Build>> = flow(
   map((res) => res.data.builds),
 );
 
-export const isMasterBranch = ({ branch }: Build) => branch === "master";
+export const isSourceBranch = ({ branch }: Build) => branch === sourceBranch;
 
 export const isSuccessful = ({ status }: Build) => status === "success";

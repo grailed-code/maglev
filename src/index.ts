@@ -103,7 +103,7 @@ const getBestDeployBundle = flow(
  * from Codeship, if it exists, to Heroku and notify the team in Slack.
  */
 const main = flow(
-  Codeship.getAllGreenMasterBuilds,
+  Codeship.getAllGreenSourceBuilds,
   TaskEither.chain(buildsToDeployBundles),
   TaskEither.chain(getBestDeployBundle),
   TaskEither.chain(Deploy.fromBundle),
