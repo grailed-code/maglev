@@ -4,6 +4,7 @@ import { request } from "../Request";
 const token = Env.get("GITHUB_ACCESS_TOKEN");
 const owner = Env.get("GITHUB_OWNER");
 const repo = Env.get("GITHUB_REPO");
+const sourceBranch = Env.get("SOURCE_BRANCH");
 
 const baseURL = `https://api.github.com/repos/${owner}/${repo}`;
 
@@ -24,4 +25,4 @@ export const get = <A>(url: string) =>
     headers,
   });
 
-export const tarURL: string = `${baseURL}/tarball/master?access_token=${token}`;
+export const tarURL: string = `${baseURL}/tarball/${sourceBranch}?access_token=${token}`;
