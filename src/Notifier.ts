@@ -4,10 +4,6 @@ import { Comparison, Commit } from "./Github";
 import { Deploy } from "./Deploy";
 import { Block, Chat } from "./Slack";
 
-const testWarningBlock = Block.section({
-  text: "🚧 _*THIS IS JUST A TEST NOTHING IS ACTUALLY BEING DEPLOYED*_ 🚧",
-});
-
 const introBlock = (targets: Array<string>) =>
   Block.section({
     text: [
@@ -56,7 +52,6 @@ export const deploySuccess = (deploy: Deploy) =>
     text: "",
     as_user: false,
     blocks: [
-      testWarningBlock,
       Block.divider,
       introBlock(deploy.targets),
       Block.divider,
