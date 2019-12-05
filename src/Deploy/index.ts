@@ -7,12 +7,10 @@ import {
   reverse,
   head,
 } from "fp-ts/lib/Array";
+import { Either, right } from "fp-ts/lib/Either";
 import { flow } from "fp-ts/lib/function";
-import {
-  TaskEither,
-  taskEither,
-  map as taskEitherMap,
-} from "fp-ts/lib/TaskEither";
+import { task, map as taskMap } from "fp-ts/lib/Task";
+import { TaskEither, map as taskEitherMap } from "fp-ts/lib/TaskEither";
 import * as Codeship from "../Codeship";
 import * as Github from "../Github";
 import * as Heroku from "../Heroku";
@@ -24,7 +22,7 @@ export interface Deploy {
   targets: Array<string>;
   comparison: Github.Comparison.Comparison;
   codeshipBuild: Codeship.Build.Build;
-  builds: Array<Heroku.Build.Build>;
+  builds: Array<Either<string, Heroku.Build.Build>>;
 }
 
 /**
@@ -39,8 +37,8 @@ export interface Deploy {
  * those functions to the bundle's Codeship build's commit sha; this results in an array of tasks
  * of Heroku builds.
  *
- * It's significantly easier for us to work with a single task of an array of builds, instead of an
- * array of tasks of builds:
+ * It's significantly easier for us to work with a single task of an array of builds (either
+ * successful or unsuccessful), instead of an array of tasks of builds:
  *
  *   Have: Array (TaskEither String HerokuBuild)
  *   Want: TaskEither String (Array HerokuBuild)
@@ -57,8 +55,9 @@ export const fromBundle = (bundle: Bundle.Bundle): TaskEither<string, Deploy> =>
   flow(
     arrayMap(Heroku.Build.safelyCreate),
     arrayAp([bundle.codeshipBuild.commit_sha]),
-    array.sequence(taskEither),
-    taskEitherMap((builds: Array<Heroku.Build.Build>) => ({
+    array.sequence(task),
+    taskMap(right),
+    taskEitherMap((builds: Array<Either<string, Heroku.Build.Build>>) => ({
       ...bundle,
       builds,
     })),
