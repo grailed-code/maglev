@@ -1,7 +1,7 @@
 import { flow, constant } from "fp-ts/lib/function";
-import { fromNullable } from "fp-ts/lib/Option";
+import { fromNullable, Option } from "fp-ts/lib/Option";
 import { fromOption, map, chain } from "fp-ts/lib/TaskEither";
-import { Request } from "../Request";
+import { Request, RequestError } from "../Request";
 import * as API from "./API";
 import * as Release from "./Release";
 
@@ -34,6 +34,15 @@ export const getById = (appName: string): ((slugId: string) => Request<Slug>) =>
     map((res) => res.data),
   );
 
+export interface NotFoundError {
+  kind: "Heroku.Slug.NotFoundError";
+  message: string;
+  stack?: string;
+  app: string;
+}
+
+type GetCurrentError = RequestError | Release.NotFoundError | NotFoundError;
+
 /**
  * getCurrent :: String -> TaskEither String Slug
  *
@@ -44,6 +53,14 @@ export const getCurrent = (appName: string): Request<Slug> =>
   flow(
     () => Release.getMostRecent(appName),
     map((r) => fromNullable(r.slug ? r.slug.id : null)),
-    chain(fromOption(constant("No current slug available."))),
+    chain<GetCurrentError, Option<string>, string>(
+      fromOption(
+        constant({
+          kind: "Heroku.Slug.NotFoundError",
+          message: "No current slug available.",
+          app: appName,
+        }),
+      ),
+    ),
     chain(getById(appName)),
   )();
