@@ -1,7 +1,8 @@
 import { head } from "fp-ts/lib/Array";
 import { flow, constant } from "fp-ts/lib/function";
-import { map, chain, fromOption } from "fp-ts/lib/TaskEither";
-import { Request } from "../Request";
+import { Option } from "fp-ts/lib/Option";
+import { TaskEither, map, chain, fromOption } from "fp-ts/lib/TaskEither";
+import { RequestError } from "../Request";
 import * as API from "./API";
 
 export interface Release {
@@ -25,6 +26,13 @@ export interface Release {
   version: number;
 }
 
+export interface NotFoundError {
+  kind: "Heroku.Release.NotFoundError";
+  message: "No Heroku Release Found";
+  stack?: string;
+  app: string;
+}
+
 /**
  * getMostRecent :: String -> Task String Release
  *
@@ -43,13 +51,24 @@ export interface Release {
  *
  * In any case, we are returning a TaskEither of a Release, not a TaskEither of an Option of a Release.
  */
-export const getMostRecent: (appName: string) => Request<Release> = flow(
-  (appName: string) =>
-    API.get<Array<Release>>(
-      `/apps/${appName}/releases`,
-      "version; order=desc, max=1",
+export const getMostRecent = (
+  appName: string,
+): TaskEither<RequestError | NotFoundError, Release> =>
+  flow(
+    (appName: string) =>
+      API.get<Array<Release>>(
+        `/apps/${appName}/releases`,
+        "version; order=desc, max=1",
+      ),
+    map((res) => res.data),
+    map(head),
+    chain<RequestError | NotFoundError, Option<Release>, Release>(
+      fromOption(
+        constant({
+          kind: "Heroku.Release.NotFoundError",
+          message: "No Heroku Release Found",
+          app: appName,
+        }),
+      ),
     ),
-  map((res) => res.data),
-  map(head),
-  chain(fromOption(constant("No Heroku Release Found"))),
-);
+  )(appName);
