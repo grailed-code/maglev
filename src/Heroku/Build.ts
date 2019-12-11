@@ -7,7 +7,8 @@ import {
   fromPredicate,
 } from "fp-ts/lib/TaskEither";
 import { any } from "../Array.Extra";
-import { Request } from "../Request";
+import MaglevError from "../MaglevError";
+import { Request, RequestError } from "../Request";
 import * as Github from "../Github";
 import * as API from "./API";
 
@@ -75,6 +76,13 @@ export const all = flow(
   map((res) => res.data),
 );
 
+export interface CreateError {
+  kind: "Heroku.Build.CreateError";
+  message: string;
+  stack?: string;
+  app: string;
+}
+
 /**
  * checkForPendingBuilds :: String -> TaskEither String String
  *
@@ -85,13 +93,19 @@ export const all = flow(
  *  - if the predicate is true, return the list of builds;
  *  - if the predicate is false, return the error message.
  */
-const checkForPendingBuilds = (app: string): TaskEither<string, string> =>
+const checkForPendingBuilds = (
+  app: string,
+): TaskEither<RequestError | CreateError, string> =>
   flow(
     all,
-    chain(
+    chain<RequestError | CreateError, Array<Build>, Array<Build>>(
       fromPredicate(
         not(any(isPending)),
-        constant("There is currently an active build."),
+        constant({
+          kind: "Heroku.Build.CreateError",
+          message: "There is currently an active build.",
+          app,
+        }),
       ),
     ),
     map(constant(app)),
