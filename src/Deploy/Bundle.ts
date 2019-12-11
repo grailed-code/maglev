@@ -2,6 +2,7 @@ import { isRight } from "fp-ts/lib/Either";
 import { flow } from "fp-ts/lib/function";
 import { ord, ordDate } from "fp-ts/lib/Ord";
 import { TaskEither, left, map } from "fp-ts/lib/TaskEither";
+import { RequestError } from "../Request";
 import * as Codeship from "../Codeship";
 import * as Env from "../Env";
 import * as Github from "../Github";
@@ -13,6 +14,20 @@ export interface Bundle {
   targets: Array<string>;
   comparison: Github.Comparison.Comparison;
   codeshipBuild: Codeship.Build.Build;
+}
+
+export interface CreateError {
+  kind: "Deploy.Bundle.CreateError";
+  message: string;
+  stack?: string;
+  build: Codeship.Build.Build;
+  slug: Heroku.Slug.Slug;
+}
+
+export interface NotFoundError {
+  kind: "Deploy.Bundle.NotFoundError";
+  message: string;
+  stack?: string;
 }
 
 /**
@@ -41,17 +56,25 @@ export interface Bundle {
 export const fromBuildAndSlug = ([build, slug]: [
   Codeship.Build.Build,
   Heroku.Slug.Slug,
-]): TaskEither<string, Bundle> => {
+]): TaskEither<RequestError | CreateError, Bundle> => {
   if (!slug.commit) {
-    return left(
-      "Cannot create a deployable from a Heroku Slug without a commit sha.",
-    );
+    return left({
+      kind: "Deploy.Bundle.CreateError",
+      message:
+        "Cannot create a Deploy Bundle from a Heroku Slug without a commit sha.",
+      build,
+      slug,
+    });
   }
 
   if (!build.commit_sha) {
-    return left(
-      "Cannot create a deployable from a Codeship Build without a commit sha.",
-    );
+    return left({
+      kind: "Deploy.Bundle.CreateError",
+      message:
+        "Cannot create a Deploy Bundle from a Codeship Build without a commit sha.",
+      build,
+      slug,
+    });
   }
 
   return flow(
