@@ -1,21 +1,38 @@
-import axios, { AxiosRequestConfig, AxiosResponse, AxiosError } from "axios";
+import axios, {
+  AxiosRequestConfig,
+  AxiosResponse,
+  AxiosError,
+  Method,
+} from "axios";
 import { TaskEither, tryCatch } from "fp-ts/lib/TaskEither";
 
-export type Request<A> = TaskEither<string, A>;
+export interface RequestError {
+  kind: "RequestError";
+  message: string;
+  stack?: string;
+  status?: string;
+  url?: string;
+  method?: Method;
+}
 
-const onError = ({ config, message, response }: AxiosError) => {
-  const lines: Array<string> = [];
+const requestError = ({
+  config,
+  code,
+  request,
+  response,
+  stack,
+  message,
+}: AxiosError): RequestError => ({
+  kind: "RequestError",
+  message,
+  stack,
+  status: code,
+  url: config.url,
+  method: config.method,
+});
 
-  if (config && config.url) lines.push(`${config.method} ${config.url}`);
-
-  lines.push(message);
-
-  if (response && response.data && response.data.message)
-    lines.push(response.data.message);
-
-  return lines.join("\n-> ");
-};
+export type Request<A> = TaskEither<RequestError, A>;
 
 export const request = <A>(
   opts: AxiosRequestConfig,
-): Request<AxiosResponse<A>> => tryCatch(() => axios(opts), onError);
+): Request<AxiosResponse<A>> => tryCatch(() => axios(opts), requestError);
