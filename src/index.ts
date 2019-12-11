@@ -12,10 +12,8 @@ import { zipFill } from "./Tuple.Extra";
 import { log } from "./Logger";
 import MaglevError from "./MaglevError";
 
-// This is the emergency brake. If it is set to "ENGAGED", it will prevent the train from running.
-if (get("EMERGENCY_BRAKE") === "ENGAGED")
-  throw new Error("🚨 EMERGENCY BRAKE ENGAGED!");
-// Please don't play with the emergency brake. It is not a toy.
+if (!/true/i.test(get("TRAIN_IS_RUNNING")))
+  throw new Error("🚨 TRAIN IS NOT RUNNING!");
 
 const [leader, ...followers] = getArray("HEROKU_APP_NAME");
 
