@@ -14,6 +14,7 @@ import { TaskEither, map as taskEitherMap } from "fp-ts/lib/TaskEither";
 import * as Codeship from "../Codeship";
 import * as Github from "../Github";
 import * as Heroku from "../Heroku";
+import { RequestError } from "../Request";
 import * as Bundle from "./Bundle";
 
 export { Bundle };
@@ -22,7 +23,7 @@ export interface Deploy {
   targets: Array<string>;
   comparison: Github.Comparison.Comparison;
   codeshipBuild: Codeship.Build.Build;
-  builds: Array<Either<string, Heroku.Build.Build>>;
+  builds: Array<Either<RequestError, Heroku.Build.Build>>;
 }
 
 /**
@@ -51,16 +52,20 @@ export interface Deploy {
  * Now that we have our task of array of builds, we can create a deploy by mapping over the
  * TaskEither and adding the list of builds to the bundle we were initially given.
  */
-export const fromBundle = (bundle: Bundle.Bundle): TaskEither<string, Deploy> =>
+export const fromBundle = (
+  bundle: Bundle.Bundle,
+): TaskEither<RequestError, Deploy> =>
   flow(
     arrayMap(Heroku.Build.safelyCreate),
     arrayAp([bundle.codeshipBuild.commit_sha]),
     array.sequence(task),
     taskMap(right),
-    taskEitherMap((builds: Array<Either<string, Heroku.Build.Build>>) => ({
-      ...bundle,
-      builds,
-    })),
+    taskEitherMap(
+      (builds: Array<Either<RequestError, Heroku.Build.Build>>) => ({
+        ...bundle,
+        builds,
+      }),
+    ),
   )(bundle.targets);
 
 /**
