@@ -6,7 +6,7 @@ _Safe, smooth, reliable, magnet-powered deployments._
 
 ## Emergency Brake
 
-If you'd like to stop the deploy train from running, you can set the `EMERGENCY_BRAKE` environment variable to `"ENGAGED"`. Any other value, and the train will run.
+If you'd like to stop the deploy train from running, you can set the `TRAIN_IS_RUNNING` environment variable to anything other than `true`. Any other value, and the train will not run.
 
 ## Contributing
 
@@ -29,7 +29,7 @@ The following environment variables are expected to be set for `yarn dev:run` to
 - For Heroku: `HEROKU_ACCESS_TOKEN`, `HEROKU_APP_NAME`
 - For Github: `GITHUB_OWNER`, `GITHUB_REPO`, `GITHUB_ACCESS_TOKEN`
 - For Slack: `SLACK_API_TOKEN`
-- Other: `SOURCE_BRANCH`, `EMERGENCY_BRAKE`
+- Other: `SOURCE_BRANCH`, `TRAIN_IS_RUNNING`
 
 ### Technologies
 
