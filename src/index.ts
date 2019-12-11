@@ -10,6 +10,7 @@ import * as Heroku from "./Heroku";
 import * as Notifier from "./Notifier";
 import { zipFill } from "./Tuple.Extra";
 import { log } from "./Logger";
+import MaglevError from "./MaglevError";
 
 // This is the emergency brake. If it is set to "ENGAGED", it will prevent the train from running.
 if (get("EMERGENCY_BRAKE") === "ENGAGED")
@@ -93,7 +94,12 @@ const buildsToDeployBundles = (builds: Array<Codeship.Build.Build>) =>
  */
 const getBestDeployBundle = flow(
   Deploy.getBestBundle,
-  TaskEither.fromOption(constant("No deployable builds found.")),
+  TaskEither.fromOption<MaglevError>(
+    constant({
+      kind: "Deploy.Bundle.NotFoundError",
+      message: "No deployable builds found.",
+    }),
+  ),
 );
 
 /**
