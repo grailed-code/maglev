@@ -1,13 +1,11 @@
 import { flow, constant, not } from "fp-ts/lib/function";
 import {
   TaskEither,
-  right,
   map,
   chain,
   fromPredicate,
 } from "fp-ts/lib/TaskEither";
 import { any } from "../Array.Extra";
-import MaglevError from "../MaglevError";
 import { Request, RequestError } from "../Request";
 import * as Github from "../Github";
 import * as API from "./API";
