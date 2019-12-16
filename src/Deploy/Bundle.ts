@@ -20,6 +20,7 @@ export interface CreateError {
   message: string;
   stack?: string;
   codeshipBuild: Codeship.Build.Build;
+  herokuBuild?: Heroku.Build.Build;
   herokuSlug?: Heroku.Slug.Slug;
 }
 
@@ -84,6 +85,40 @@ export const fromBuildAndSlug = ([build, slug]: [
       codeshipBuild: build,
     })),
   )(slug.commit, build.commit_sha);
+};
+
+export const fromBuilds = ([codeshipBuild, herokuBuild]: [
+  Codeship.Build.Build,
+  Heroku.Build.Build,
+]): TaskEither<RequestError | CreateError, Bundle> => {
+  if (!herokuBuild.source_blob.version) {
+    return left({
+      kind: "Deploy.Bundle.CreateError",
+      message:
+        "Cannot create a Deploy Bundle from a Heroku Build without a source version.",
+      codeshipBuild,
+      herokuBuild,
+    });
+  }
+
+  if (!codeshipBuild.commit_sha) {
+    return left({
+      kind: "Deploy.Bundle.CreateError",
+      message:
+        "Cannot create a Deploy Bundle from a Codeship Build without a commit sha.",
+      codeshipBuild,
+      herokuBuild,
+    });
+  }
+
+  return flow(
+    Github.Comparison.getComparison,
+    map((comparison) => ({
+      targets: appNames,
+      comparison,
+      codeshipBuild: codeshipBuild,
+    })),
+  )(herokuBuild.source_blob.version, codeshipBuild.commit_sha);
 };
 
 /**
