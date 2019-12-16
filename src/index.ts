@@ -18,9 +18,9 @@ if (!/true/i.test(get("TRAIN_IS_RUNNING")))
 const [leader, ...followers] = getArray("HEROKU_APP_NAME");
 
 /**
- * buildAndSlugPairsToDeployBundles :: Array (Tuple Codeship.Build.Build Heroku.Slug.Slug) -> TaskEither String (Array Deploy.Bundle.Bundle)
+ * buildPairsToDeployBundles :: Array (Tuple Codeship.Build.Build Heroku.Build.Build) -> TaskEither String (Array Deploy.Bundle.Bundle)
  *
- * Converts the given array of Codeship build / Heroku slug pairs into an array of deploy bundles,
+ * Converts the given array of Codeship build / Heroku build pairs into an array of deploy bundles,
  * wrapped in a TaskEither because there are some async operations that need to happen.
  *
  * First, we iterate over all of the pairs, attempting to create a deploy bundle for each.
@@ -35,7 +35,7 @@ const [leader, ...followers] = getArray("HEROKU_APP_NAME");
  * of the TaskEithers if any one of them is a Left.
  *
  * Unfortunately for us, this isn't the behavior we want! If the attempt to create a deploy bundle
- * for any one build/slug pair fails, that's okay. We want to filter those failures out and keep
+ * for any one build/build pair fails, that's okay. We want to filter those failures out and keep
  * the successful ones around, not lose everything.
  *
  * We model this by using array.sequence(task) which does the following:
@@ -61,8 +61,8 @@ const [leader, ...followers] = getArray("HEROKU_APP_NAME");
  * To be clear, `TaskEither e a` is the exact same thing as `Task (Either e a)`, I broke it out
  * with the parenthesis to make the explaination more clear.
  */
-const buildAndSlugPairsToDeployBundles = flow(
-  Array.map(Deploy.Bundle.fromBuildAndSlug),
+const buildPairsToDeployBundles = flow(
+  Array.map(Deploy.Bundle.fromBuilds),
   Array.array.sequence(Task.task),
   Task.map(Array.rights),
   Task.map(Either.right),
@@ -74,15 +74,15 @@ const buildAndSlugPairsToDeployBundles = flow(
  * Converts the given array of Codeship builds to an array of deploy bundles, wrapped in a
  * TaskEither because there are a bunch of async operations that need to happen.
  *
- * We start by getting the current slug from the primary Heroku app we want to target.
- * Then, we pair that slug with each of the given Codeship builds.
- * Finally, we convert all of the Codeship build / Heroku slug pairs into deploy bundles.
+ * We start by getting the current build from the primary Heroku app we want to target.
+ * Then, we pair that build with each of the given Codeship builds.
+ * Finally, we convert all of the Codeship build / Heroku build pairs into deploy bundles.
  */
 const buildsToDeployBundles = (builds: Array<Codeship.Build.Build>) =>
   flow(
-    Heroku.Slug.getCurrent,
-    TaskEither.map((slug) => zipFill([builds, slug])),
-    TaskEither.chain(buildAndSlugPairsToDeployBundles),
+    Heroku.Build.getMostRecent,
+    TaskEither.map((build) => zipFill([builds, build])),
+    TaskEither.chain(buildPairsToDeployBundles),
   )(leader);
 
 /**
