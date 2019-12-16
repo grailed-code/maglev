@@ -1,4 +1,3 @@
-import { isRight } from "fp-ts/lib/Either";
 import { flow } from "fp-ts/lib/function";
 import { ord, ordDate } from "fp-ts/lib/Ord";
 import { TaskEither, left, map } from "fp-ts/lib/TaskEither";
