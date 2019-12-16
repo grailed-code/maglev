@@ -3,6 +3,8 @@ import { flow } from "fp-ts/lib/function";
 import { Comparison, Commit } from "./Github";
 import { Deploy } from "./Deploy";
 import { Block, Chat } from "./Slack";
+import { get } from "./Env";
+
 
 const introBlock = (targets: Array<string>) =>
   Block.section({
@@ -48,7 +50,7 @@ const linkToCommitsBlock = (c: Comparison.Comparison) =>
 
 export const deploySuccess = (deploy: Deploy) =>
   Chat.postMessage({
-    channel: "#maglev-test",
+    channel: get("NOTIFICATIONS_CHANNEL"),
     text: "",
     as_user: false,
     blocks: [
