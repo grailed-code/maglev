@@ -7,6 +7,7 @@ type MaglevError =
   | Deploy.Bundle.CreateError
   | Deploy.Bundle.NotFoundError
   | Heroku.Build.CreateError
+  | Heroku.Build.NotFoundError
   | Heroku.Release.NotFoundError
   | Heroku.Slug.NotFoundError;
 
