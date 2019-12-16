@@ -19,8 +19,8 @@ export interface CreateError {
   kind: "Deploy.Bundle.CreateError";
   message: string;
   stack?: string;
-  build: Codeship.Build.Build;
-  slug: Heroku.Slug.Slug;
+  codeshipBuild: Codeship.Build.Build;
+  herokuSlug?: Heroku.Slug.Slug;
 }
 
 export interface NotFoundError {
@@ -61,8 +61,8 @@ export const fromBuildAndSlug = ([build, slug]: [
       kind: "Deploy.Bundle.CreateError",
       message:
         "Cannot create a Deploy Bundle from a Heroku Slug without a commit sha.",
-      build,
-      slug,
+      codeshipBuild: build,
+      herokuSlug: slug,
     });
   }
 
@@ -71,8 +71,8 @@ export const fromBuildAndSlug = ([build, slug]: [
       kind: "Deploy.Bundle.CreateError",
       message:
         "Cannot create a Deploy Bundle from a Codeship Build without a commit sha.",
-      build,
-      slug,
+      codeshipBuild: build,
+      herokuSlug: slug,
     });
   }
 
