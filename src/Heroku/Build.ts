@@ -110,7 +110,7 @@ export const getMostRecent = (
     (appName: string) =>
       API.get<Array<Build>>(
         `/apps/${appName}/builds`,
-        "created_at; order=desc, max=1",
+        "created_at; order=desc, max=10",
       ),
     map((res) => res.data),
     map(filter(not(isFailed))),
