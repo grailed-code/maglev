@@ -25,4 +25,5 @@ export const get = <A>(url: string) =>
     headers,
   });
 
-export const tarURL: string = `${baseURL}/tarball/${sourceBranch}?access_token=${token}`;
+export const tarURL = (sha: string): string =>
+  `${baseURL}/tarball/${sha}?access_token=${token}`;

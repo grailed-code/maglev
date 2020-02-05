@@ -51,7 +51,7 @@ interface CreateParams {
 
 const buildCreateParams = (commitSha: string): CreateParams => ({
   source_blob: {
-    url: Github.API.tarURL,
+    url: Github.API.tarURL(commitSha),
     version: commitSha,
   },
 });
