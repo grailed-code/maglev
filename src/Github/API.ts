@@ -1,12 +1,13 @@
 import * as Env from "../Env";
 import { request } from "../Request";
 
+const userName = Env.get("GITHUB_USER_NAME");
 const token = Env.get("GITHUB_ACCESS_TOKEN");
 const owner = Env.get("GITHUB_OWNER");
 const repo = Env.get("GITHUB_REPO");
 const sourceBranch = Env.get("SOURCE_BRANCH");
 
-const baseURL = `https://api.github.com/repos/${owner}/${repo}`;
+const baseURL = `https://${userName}:${token}@api.github.com/repos/${owner}/${repo}`;
 
 const headers = {
   Authorization: `token ${token}`,
@@ -26,4 +27,4 @@ export const get = <A>(url: string) =>
   });
 
 export const tarURL = (sha: string): string =>
-  `${baseURL}/tarball/${sha}?access_token=${token}`;
+  `${baseURL}/tarball/${sha}`;
