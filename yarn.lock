@@ -1155,10 +1155,10 @@ follow-redirects@^1.14.0:
   resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.15.0.tgz#06441868281c86d0dda4ad8bdaead2d02dca89d4"
   integrity sha512-aExlJShTV4qOUOL7yF1U5tvLCB0xQuudbf6toyYA0E/acBNw71mvjFTnLaRp50aQaYocMR0a/RMMBIHeZnGyjQ==
 
-fp-ts@2.1.2:
-  version "2.1.2"
-  resolved "https://registry.yarnpkg.com/fp-ts/-/fp-ts-2.1.2.tgz#6acab50af1ac5044ebd6e6c38d83e3b5905a7982"
-  integrity sha512-oOZ/gc+lxTSfKRk6vnAAie2HQTWMH7yhaIM0+gW8fAi4JAiPT/OmEpW5ps3VuapPGNqnZ++4p56hv3PEd1qUFg==
+fp-ts@^2.12.1:
+  version "2.12.1"
+  resolved "https://registry.yarnpkg.com/fp-ts/-/fp-ts-2.12.1.tgz#e389488bfd1507af06bd5965e97367edcd4fabad"
+  integrity sha512-oxvgqUYR6O9VkKXrxkJ0NOyU0FrE705MeqgBUMEPWyTu6Pwn768cJbHChw2XOBlgFLKfIHxjr2OOBFpv2mUGZw==
 
 fs.realpath@^1.0.0:
   version "1.0.0"
