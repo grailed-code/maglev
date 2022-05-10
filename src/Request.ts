@@ -13,6 +13,7 @@ export interface RequestError {
   status?: string;
   url?: string;
   method?: Method;
+  response?: AxiosResponse;
 }
 
 const requestError = ({
@@ -29,6 +30,7 @@ const requestError = ({
   status: code,
   url: config.url,
   method: config.method,
+  response,
 });
 
 export type Request<A> = TaskEither<RequestError, A>;
