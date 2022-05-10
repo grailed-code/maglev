@@ -15,7 +15,7 @@
   "dependencies": {
     "axios": "0.21.2",
     "dotenv": "8.2.0",
-    "fp-ts": "2.1.2"
+    "fp-ts": "^2.12.1"
   },
   "devDependencies": {
     "@types/axios": "0.14.0",
