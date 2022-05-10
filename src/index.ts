@@ -7,6 +7,7 @@ import * as Codeship from "./Codeship";
 import { get, getArray } from "./Env";
 import * as Deploy from "./Deploy";
 import * as Heroku from "./Heroku";
+import * as Slack from "./Slack";
 import * as Notifier from "./Notifier";
 import { zipFill } from "./Tuple.Extra";
 import { log } from "./Logger";
@@ -111,7 +112,9 @@ const main = flow(
   TaskEither.chain(buildsToDeployBundles),
   TaskEither.chain(getBestDeployBundle),
   TaskEither.chain(Deploy.fromBundle),
-  TaskEither.chain(Notifier.deploySuccess),
+  TaskEither.bimap(Notifier.deployError, Notifier.deploySuccess),
+  TaskEither.toUnion,
+  Task.chain(Slack.Chat.postMessage),
   TaskEither.bimap(log, log),
 );
 
