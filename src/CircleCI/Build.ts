@@ -21,6 +21,11 @@ interface Workflow {
   stopped_at: string;
 }
 
+interface WorkflowResponse {
+  items: Array<Workflow>;
+  next_page_token: string | null;
+}
+
 interface PipelineError {
   type: string;
   message: string;
@@ -61,7 +66,7 @@ interface Pipeline {
 
 interface AllPipelinesResponse {
   items: Array<Pipeline>;
-  next_page_token: string;
+  next_page_token: string | null;
 }
 
 
@@ -81,8 +86,10 @@ export const isCreated = ({ state }: Pipeline) => state === "created";
 export const isSuccessful = ({ status }: Workflow) => status === "success";
 
 const pipelineToWorkflow = (pipeline: Pipeline): Request<[Pipeline, Workflow]> => {
-  const workflow = API.getWorkflow<Workflow>(pipeline.id);
-  return taskEitherMap((res: AxiosResponse<Workflow>): [Pipeline, Workflow] => [pipeline, res.data])(workflow);
+  const workflow = API.getWorkflow<WorkflowResponse>(pipeline.id);
+  return taskEitherMap(
+    (res: AxiosResponse<WorkflowResponse>): [Pipeline, Workflow] => [pipeline, res.data.items[0]]
+  )(workflow);
 };
 
 const createBuildFromPipelineAndWorkflow = ([pipeline, workflow]: [Pipeline, Workflow]): Build => ({
