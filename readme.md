@@ -25,6 +25,7 @@ yarn dev:run
 
 The following environment variables are expected to be set for `yarn dev:run` to work:
 
+- For CircleCI: `CIRCLECI_TOKEN`
 - For Codeship: `CODESHIP_USERNAME`, `CODESHIP_PASSWORD`, `CODESHIP_ORGANIZATION_ID`, `CODESHIP_PROJECT_ID`
 - For Heroku: `HEROKU_ACCESS_TOKEN`, `HEROKU_APP_NAME`
 - For Github: `GITHUB_OWNER`, `GITHUB_REPO`, `GITHUB_ACCESS_TOKEN`

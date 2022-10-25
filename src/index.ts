@@ -4,6 +4,7 @@ import { flow, constant } from "fp-ts/lib/function";
 import * as Task from "fp-ts/lib/Task";
 import * as TaskEither from "fp-ts/lib/TaskEither";
 import * as Codeship from "./Codeship";
+import * as CircleCI from "./CircleCI";
 import { get, getArray } from "./Env";
 import * as Deploy from "./Deploy";
 import * as Heroku from "./Heroku";
@@ -108,7 +109,7 @@ const getBestDeployBundle = flow(
  * from Codeship, if it exists, to Heroku and notify the team in Slack.
  */
 const main = flow(
-  Codeship.getAllGreenSourceBuilds,
+  process.env.CI_TOOL === 'Codeship' ? Codeship.getAllGreenSourceBuilds : CircleCI.getAllGreenSourceBuilds,
   TaskEither.chain(buildsToDeployBundles),
   TaskEither.chain(getBestDeployBundle),
   TaskEither.chain(Deploy.fromBundle),
