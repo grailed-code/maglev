@@ -8,7 +8,7 @@ export const getWorkflow = <A>(pipelineId: string) => {
   return request<A>(
     {
       baseURL: baseUrl,
-      url: `/workflow/${pipelineId}`,
+      url: `/pipeline/${pipelineId}/workflow`,
       auth: {
         username: circleciToken,
         password: "",
