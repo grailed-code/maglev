@@ -11,3 +11,5 @@ const sourceBranch = Env.get("SOURCE_BRANCH");
  * successful ("green").
  */
 export const getAllGreenSourceBuilds = (): Request<Array<Build>> => getAll(sourceBranch);
+
+export { Build };

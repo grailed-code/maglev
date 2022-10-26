@@ -80,7 +80,7 @@ const buildPairsToDeployBundles = flow(
  * Then, we pair that build with each of the given Codeship builds.
  * Finally, we convert all of the Codeship build / Heroku build pairs into deploy bundles.
  */
-const buildsToDeployBundles = (builds: Array<Codeship.Build.Build>) =>
+const buildsToDeployBundles = (builds: Array<Codeship.Build.Build | CircleCI.Build>) =>
   flow(
     Heroku.Build.getMostRecent,
     TaskEither.map((build) => zipFill([builds, build])),
