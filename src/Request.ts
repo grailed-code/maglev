@@ -16,7 +16,7 @@ export interface RequestError {
   response?: AxiosResponse;
 }
 
-const requestError = ({
+export const requestError = ({
   config,
   code,
   request,
