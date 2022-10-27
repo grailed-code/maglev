@@ -11,12 +11,12 @@ interface PipelineError {
 export interface Pipeline {
   id: string;
   project_slug: string;
-  updated_at: string;
+  updated_at?: string;
   created_at: string;
   number: string;
   state: string;
   errors: Array<PipelineError>;
-  trigger_parameters: any;
+  trigger_parameters?: any;
   trigger: {
     type: string;
     received_at: string;
@@ -25,7 +25,7 @@ export interface Pipeline {
       avatar_url: string;
     }
   };
-  vcs: {
+  vcs?: {
     provider_name: string;
     target_repository_url: string;
     branch: string | null;
@@ -34,7 +34,7 @@ export interface Pipeline {
     revision: string;
     tag: string;
     origin_repository_url: string; 
-    commit: {
+    commit?: {
       subject: string;
       body: string;
     }
@@ -45,7 +45,7 @@ export interface Pipeline {
 interface AllPipelinesResponse {
   items: Array<Pipeline>;
   next_page_token: string | null;
-}
+};
 
 
 export const isCreated = ({ state }: Pipeline) => state === "created";
