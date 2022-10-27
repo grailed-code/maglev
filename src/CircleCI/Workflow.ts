@@ -1,7 +1,7 @@
 import { pipe } from "fp-ts/lib/function";
-import { map as taskEitherMap, chain, right, left } from "fp-ts/lib/TaskEither";
+import { chain, right, left } from "fp-ts/lib/TaskEither";
 import { get } from "./API";
-import { Request, requestError } from "../Request";
+import { Request } from "../Request";
 
 
 export interface Workflow {
@@ -26,7 +26,7 @@ interface WorkflowResponse {
 
 export const getWorkflow = (pipelineId: string): Request<Workflow> => {
   return pipe(
-    get<WorkflowResponse>(pipelineId),
+    get<WorkflowResponse>(`/pipeline/${pipelineId}/workflow`),
     chain((res) => { 
       const workflow = res.data.items[0] 
       if (!workflow) {

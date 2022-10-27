@@ -113,6 +113,7 @@ const main = flow(
   TaskEither.chain(buildsToDeployBundles),
   TaskEither.chain(getBestDeployBundle),
   TaskEither.chain(Deploy.fromBundle),
+  TaskEither.bimap(log, log),
   TaskEither.bimap(Notifier.deployError, Notifier.deploySuccess),
   TaskEither.toUnion,
   Task.chain(Slack.Chat.postMessage),

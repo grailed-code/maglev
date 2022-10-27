@@ -19,12 +19,12 @@ export interface Build {
 
 const createBuildFromPipelineAndWorkflow = ([pipeline, workflow]: [Pipeline.Pipeline, Workflow.Workflow]): Build => ({
   project_uuid: pipeline.project_slug,
-  commit_message: pipeline.vcs.commit.subject,
+  commit_message: pipeline.vcs?.commit?.subject || null,
   status: workflow.status,
-  branch: pipeline.vcs.branch,
+  branch: pipeline.vcs?.branch || null,
   uuid: workflow.id,
   queued_at: workflow.created_at,
-  commit_sha: pipeline.vcs.revision,
+  commit_sha: pipeline.vcs?.revision || null,
   finished_at: workflow.stopped_at,
   allocated_at: null,
 });
