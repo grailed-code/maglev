@@ -1,74 +1,9 @@
-import { ApplicativePar, flatten, map as taskEitherMap, chain } from "fp-ts/lib/TaskEither";
-import { filterMap, filter, sequence, map as arrayMap } from "fp-ts/lib/Array";
+import { ApplicativePar, map as taskEitherMap, chain } from "fp-ts/lib/TaskEither";
+import { filter, sequence, map as arrayMap } from "fp-ts/lib/Array";
 import { flow, pipe } from "fp-ts/lib/function";
 import { Request } from "../Request";
-import * as API from "./API";
-import { AxiosResponse } from "axios";
-
-
-interface Workflow {
-  id: string;
-  name: string;
-  project_slug: string;
-  status: string;
-  pipeline_id: string;
-  canceled_by: string;
-  error_by: string;
-  tag: string;
-  started_by: string;
-  pipeline_number: string;
-  created_at: string;
-  stopped_at: string;
-}
-
-interface WorkflowResponse {
-  items: Array<Workflow>;
-  next_page_token: string | null;
-}
-
-interface PipelineError {
-  type: string;
-  message: string;
-};
-
-interface Pipeline {
-  id: string;
-  project_slug: string;
-  updated_at: string;
-  created_at: string;
-  number: string;
-  state: string;
-  errors: Array<PipelineError>;
-  trigger_parameters: any;
-  trigger: {
-    type: string;
-    received_at: string;
-    actor: {
-      login: string;
-      avatar_url: string;
-    }
-  };
-  vcs: {
-    provider_name: string;
-    target_repository_url: string;
-    branch: string | null;
-    review_id: string;
-    review_url: string;
-    revision: string;
-    tag: string;
-    origin_repository_url: string; 
-    commit: {
-      subject: string;
-      body: string;
-    }
-  }
-}
-
-interface AllPipelinesResponse {
-  items: Array<Pipeline>;
-  next_page_token: string | null;
-}
-
+import * as Pipeline from "./Pipeline";
+import * as Workflow from "./Workflow";
 
 export interface Build {
   project_uuid: string | null;
@@ -82,17 +17,7 @@ export interface Build {
   allocated_at: string | null;
 }
 
-export const isCreated = ({ state }: Pipeline) => state === "created";
-export const isSuccessful = ({ status }: Workflow) => status === "success";
-
-const pipelineToWorkflow = (pipeline: Pipeline): Request<[Pipeline, Workflow]> => {
-  const workflow = API.getWorkflow<WorkflowResponse>(pipeline.id);
-  return taskEitherMap(
-    (res: AxiosResponse<WorkflowResponse>): [Pipeline, Workflow] => [pipeline, res.data.items[0]]
-  )(workflow);
-};
-
-const createBuildFromPipelineAndWorkflow = ([pipeline, workflow]: [Pipeline, Workflow]): Build => ({
+const createBuildFromPipelineAndWorkflow = ([pipeline, workflow]: [Pipeline.Pipeline, Workflow.Workflow]): Build => ({
   project_uuid: pipeline.project_slug,
   commit_message: pipeline.vcs.commit.subject,
   status: workflow.status,
@@ -104,12 +29,19 @@ const createBuildFromPipelineAndWorkflow = ([pipeline, workflow]: [Pipeline, Wor
   allocated_at: null,
 });
 
+const pipelineAndWorkflow = (pipeline: Pipeline.Pipeline): Request<[Pipeline.Pipeline, Workflow.Workflow]> => {
+  return pipe(
+    Workflow.getWorkflow(pipeline.id),
+    taskEitherMap((workflow) => [pipeline, workflow])
+  );
+};
+
+export const isSuccessful = ({ status }: Build) => status === "success";
+
 export const getAll: (branch: string) => Request<Array<Build>> = flow(
-  (branch) => API.getAllPipelines<AllPipelinesResponse>(branch), // Request<AxiosResponse<AllPipelinesResponse>>
-  taskEitherMap((res) => res.data.items), // Request<Array<Pipeline>>
-  taskEitherMap(filter(isCreated)), // Request<Array<Pipeline>>
-  taskEitherMap(arrayMap(pipelineToWorkflow)), // Request<Array<Request<[Pipeline, Workflow]>>>
+  (branch) => Pipeline.getAllPipelines(branch), // Request<Array<Pipeline>>
+  taskEitherMap(filter(Pipeline.isCreated)), // Request<Array<Pipeline>>
+  taskEitherMap(arrayMap(pipelineAndWorkflow)), // Request<Array<Request<[Pipeline, Workflow]>>>
   chain(sequence(ApplicativePar)), // Request<Array<[Pipeline, Workflow]>>
-  taskEitherMap(filter(([pipeline, workflow]) => isSuccessful(workflow))), // Request<Array<[Pipeline, Workflow]>>
   taskEitherMap(arrayMap(createBuildFromPipelineAndWorkflow)), // Request<Array<Build>>
 );

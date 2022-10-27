@@ -4,25 +4,13 @@ import { request } from "../Request";
 const circleciToken = Env.get("CIRCLECI_TOKEN");
 const baseUrl = "https://circleci.com/api/v2/"
 
-export const getWorkflow = <A>(pipelineId: string) => {
-  return request<A>(
-    {
-      baseURL: baseUrl,
-      url: `/pipeline/${pipelineId}/workflow`,
-      auth: {
-        username: circleciToken,
-        password: "",
-      }
-    }
-  );
-}
 
-export const getAllPipelines = <A>(branch: string) => {
+export const get = <A>(url: string, params?: Object) => {
   return request<A>(
     {
       baseURL: baseUrl,
-      url: "/project/gh/grailed-code/grailed/pipeline",
-      params: { branch: branch },
+      url: url,
+      params: params,
       auth: {
         username: circleciToken,
         password: "",
