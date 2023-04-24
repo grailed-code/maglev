@@ -11,7 +11,7 @@ export const post = <D, A>(url: string, data: D) =>
     method: "POST",
     headers: {
       Authorization: `Bearer ${token}`,
-      "Content-type": "application/json",
+      "Content-type": "application/json; charset=utf-8",
     },
     data,
   });
