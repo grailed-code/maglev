@@ -1,5 +1,5 @@
 export default {
   "compileEnhancements": false,
   "extensions": ["ts"],
-  "require": ["ts-node/register"]
+  "require": ["ts-node/register/index.js"]
 }
