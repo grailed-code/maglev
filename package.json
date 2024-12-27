@@ -13,15 +13,18 @@
     "test:watch": "ava -wv"
   },
   "dependencies": {
-    "axios": "0.21.2",
+    "ansi-regex": "^4.1.0",
+    "axios": "^0.24.0",
     "dotenv": "8.2.0",
     "fp-ts": "^2.12.1"
   },
   "devDependencies": {
     "@types/axios": "0.14.0",
-    "ava": "2.4.0",
+    "@types/node": "^22.10.2",
+    "ava": "~6.2.0",
+    "minimatch": "^3.0.4",
     "prettier": "1.18.2",
     "ts-node": "8.4.1",
-    "typescript": "3.7.2"
+    "typescript": "5.7.2"
   }
 }
