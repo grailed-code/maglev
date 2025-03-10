@@ -11,7 +11,7 @@ import { Either, right } from "fp-ts/lib/Either";
 import { flow } from "fp-ts/lib/function";
 import { task, map as taskMap } from "fp-ts/lib/Task";
 import { TaskEither, map as taskEitherMap } from "fp-ts/lib/TaskEither";
-import * as Codeship from "../Codeship";
+import * as CircleCI from "../CircleCI";
 import * as Github from "../Github";
 import * as Heroku from "../Heroku";
 import { RequestError } from "../Request";
@@ -22,7 +22,7 @@ export { Bundle };
 export interface Deploy {
   targets: Array<string>;
   comparison: Github.Comparison.Comparison;
-  codeshipBuild: Codeship.Build.Build;
+  circleCIBuild: CircleCI.Build;
   builds: Array<Either<RequestError, Heroku.Build.Build>>;
 }
 
@@ -35,7 +35,7 @@ export interface Deploy {
  * bundle, and does all of the work to package the results up into a single, tidy task.
  *
  * From the list of targets, we partially apply Heroku.Build.create with each target, then we apply
- * those functions to the bundle's Codeship build's commit sha; this results in an array of tasks
+ * those functions to the bundle's CircleCI build's commit sha; this results in an array of tasks
  * of Heroku builds.
  *
  * It's significantly easier for us to work with a single task of an array of builds (either
@@ -57,7 +57,7 @@ export const fromBundle = (
 ): TaskEither<RequestError, Deploy> =>
   flow(
     arrayMap(Heroku.Build.safelyCreate),
-    arrayAp([bundle.codeshipBuild.commit_sha]),
+    arrayAp([bundle.circleCIBuild.commit_sha]),
     array.sequence(task),
     taskMap(right),
     taskEitherMap(
@@ -73,7 +73,7 @@ export const fromBundle = (
  *
  * Given an array of deploy bundles, tries to get the best one to deploy.
  * First, we remove all of the bundles that are not deployable.
- * Then we choose the bundle with the most recent queued at timestamp on its Codeship build.
+ * Then we choose the bundle with the most recent queued at timestamp on its CircleCI build.
  */
 export const getBestBundle = flow(
   filter(Bundle.isDeployable),
