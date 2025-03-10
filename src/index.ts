@@ -3,7 +3,6 @@ import * as Either from "fp-ts/lib/Either";
 import { flow, constant } from "fp-ts/lib/function";
 import * as Task from "fp-ts/lib/Task";
 import * as TaskEither from "fp-ts/lib/TaskEither";
-import * as Codeship from "./Codeship";
 import * as CircleCI from "./CircleCI";
 import { get, getArray } from "./Env";
 import * as Deploy from "./Deploy";
@@ -20,9 +19,9 @@ if (!/true/i.test(get("TRAIN_IS_RUNNING")))
 const [leader, ...followers] = getArray("HEROKU_APP_NAME");
 
 /**
- * buildPairsToDeployBundles :: Array (Tuple Codeship.Build.Build Heroku.Build.Build) -> TaskEither String (Array Deploy.Bundle.Bundle)
+ * buildPairsToDeployBundles :: Array (Tuple CircleCI.Build Heroku.Build.Build) -> TaskEither String (Array Deploy.Bundle.Bundle)
  *
- * Converts the given array of Codeship build / Heroku build pairs into an array of deploy bundles,
+ * Converts the given array of CircleCI build / Heroku build pairs into an array of deploy bundles,
  * wrapped in a TaskEither because there are some async operations that need to happen.
  *
  * First, we iterate over all of the pairs, attempting to create a deploy bundle for each.
@@ -71,16 +70,16 @@ const buildPairsToDeployBundles = flow(
 );
 
 /**
- * buildsToDeployBundles :: Array Codeship.Build.Build -> TaskEither String (Array Deploy.Bundle.Bundle)
+ * buildsToDeployBundles :: Array CircleCI.Build -> TaskEither String (Array Deploy.Bundle.Bundle)
  *
- * Converts the given array of Codeship builds to an array of deploy bundles, wrapped in a
+ * Converts the given array of CircleCI builds to an array of deploy bundles, wrapped in a
  * TaskEither because there are a bunch of async operations that need to happen.
  *
  * We start by getting the current build from the primary Heroku app we want to target.
- * Then, we pair that build with each of the given Codeship builds.
- * Finally, we convert all of the Codeship build / Heroku build pairs into deploy bundles.
+ * Then, we pair that build with each of the given CircleCI builds.
+ * Finally, we convert all of the CircleCI build / Heroku build pairs into deploy bundles.
  */
-const buildsToDeployBundles = (builds: Array<Codeship.Build.Build | CircleCI.Build>) =>
+const buildsToDeployBundles = (builds: Array<CircleCI.Build | CircleCI.Build>) =>
   flow(
     Heroku.Build.getMostRecent,
     TaskEither.map((build) => zipFill([builds, build])),
@@ -106,7 +105,7 @@ const getBestDeployBundle = flow(
  * main :: () -> TaskEither String Slack.Chat.PostMessageResponse
  *
  * This function returns a task of all of the work we need to do to deploy the best green build
- * from Codeship, if it exists, to Heroku and notify the team in Slack.
+ * from CircleCI, if it exists, to Heroku and notify the team in Slack.
  */
 const main = flow(
   CircleCI.getAllGreenSourceBuilds,

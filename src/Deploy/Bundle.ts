@@ -2,7 +2,7 @@ import { flow } from "fp-ts/lib/function";
 import { ord, ordDate } from "fp-ts/lib/Ord";
 import { TaskEither, left, map } from "fp-ts/lib/TaskEither";
 import { RequestError } from "../Request";
-import * as Codeship from "../Codeship";
+import * as CircleCI from "../CircleCI";
 import * as Env from "../Env";
 import * as Github from "../Github";
 import * as Heroku from "../Heroku";
@@ -12,14 +12,14 @@ const appNames = Env.getArray("HEROKU_APP_NAME");
 export interface Bundle {
   targets: Array<string>;
   comparison: Github.Comparison.Comparison;
-  codeshipBuild: Codeship.Build.Build;
+  circleCIBuild: CircleCI.Build;
 }
 
 export interface CreateError {
   kind: "Deploy.Bundle.CreateError";
   message: string;
   stack?: string;
-  codeshipBuild: Codeship.Build.Build;
+  circleCIBuild: CircleCI.Build;
   herokuBuild?: Heroku.Build.Build;
   herokuSlug?: Heroku.Slug.Slug;
 }
@@ -31,14 +31,14 @@ export interface NotFoundError {
 }
 
 /**
- * fromBuildAndSlug :: Tuple Codeship.Build.Build Heroku.Slug.Slug -> TaskEither String Bundle
+ * fromBuildAndSlug :: Tuple CircleCI.Build Heroku.Slug.Slug -> TaskEither String Bundle
  *
- * Returns a task of a deploy bundle created from the given Codeship build and Heroku slug. In
+ * Returns a task of a deploy bundle created from the given CircleCI build and Heroku slug. In
  * order to create a bundle, we need three things:
  *
  * - a set of targets, declared in the environment (for now);
- * - a build from Codeship that we might want to deploy; and
- * - a git comparison of the commit from the Codeship build against the commit from the Heroku slug.
+ * - a build from CircleCI that we might want to deploy; and
+ * - a git comparison of the commit from the CircleCI build against the commit from the Heroku slug.
  *
  * If the Heroku slug does not have a commit, we immediately return a Left of an error message.
  *
@@ -46,15 +46,15 @@ export interface NotFoundError {
  * etc. will only operate on the right side of the Either. If we need to map functions over the
  * left side, we can use functions like bimap or mapLeft.
  *
- * Similarly to the Heroku slug, if the Codeship build doesn't have a commit sha, we immediately
+ * Similarly to the Heroku slug, if the CircleCI build doesn't have a commit sha, we immediately
  * return a Left of an error message.
  *
- * Once we know that we have commit shas from the Heroku slug and the Codeship build, we can make
+ * Once we know that we have commit shas from the Heroku slug and the CircleCI build, we can make
  * task of a request to get a comparison of those shas from Github. With that task in hand, we can
  * map over it to create a task of the created deploy bundle.
  */
 export const fromBuildAndSlug = ([build, slug]: [
-  Codeship.Build.Build,
+  CircleCI.Build,
   Heroku.Slug.Slug,
 ]): TaskEither<RequestError | CreateError, Bundle> => {
   if (!slug.commit) {
@@ -62,7 +62,7 @@ export const fromBuildAndSlug = ([build, slug]: [
       kind: "Deploy.Bundle.CreateError",
       message:
         "Cannot create a Deploy Bundle from a Heroku Slug without a commit sha.",
-      codeshipBuild: build,
+      circleCIBuild: build,
       herokuSlug: slug,
     });
   }
@@ -71,8 +71,8 @@ export const fromBuildAndSlug = ([build, slug]: [
     return left({
       kind: "Deploy.Bundle.CreateError",
       message:
-        "Cannot create a Deploy Bundle from a Codeship Build without a commit sha.",
-      codeshipBuild: build,
+        "Cannot create a Deploy Bundle from a CircleCI Build without a commit sha.",
+      circleCIBuild: build,
       herokuSlug: slug,
     });
   }
@@ -82,13 +82,13 @@ export const fromBuildAndSlug = ([build, slug]: [
     map((comparison) => ({
       targets: appNames,
       comparison,
-      codeshipBuild: build,
+      circleCIBuild: build,
     })),
   )(slug.commit, build.commit_sha);
 };
 
-export const fromBuilds = ([codeshipBuild, herokuBuild]: [
-  Codeship.Build.Build,
+export const fromBuilds = ([circleCIBuild, herokuBuild]: [
+  CircleCI.Build,
   Heroku.Build.Build,
 ]): TaskEither<RequestError | CreateError, Bundle> => {
   if (!herokuBuild.source_blob.version) {
@@ -96,17 +96,17 @@ export const fromBuilds = ([codeshipBuild, herokuBuild]: [
       kind: "Deploy.Bundle.CreateError",
       message:
         "Cannot create a Deploy Bundle from a Heroku Build without a source version.",
-      codeshipBuild,
+      circleCIBuild,
       herokuBuild,
     });
   }
 
-  if (!codeshipBuild.commit_sha) {
+  if (!circleCIBuild.commit_sha) {
     return left({
       kind: "Deploy.Bundle.CreateError",
       message:
-        "Cannot create a Deploy Bundle from a Codeship Build without a commit sha.",
-      codeshipBuild,
+        "Cannot create a Deploy Bundle from a CircleCI Build without a commit sha.",
+      circleCIBuild,
       herokuBuild,
     });
   }
@@ -116,9 +116,9 @@ export const fromBuilds = ([codeshipBuild, herokuBuild]: [
     map((comparison) => ({
       targets: appNames,
       comparison,
-      codeshipBuild: codeshipBuild,
+      circleCIBuild,
     })),
-  )(herokuBuild.source_blob.version, codeshipBuild.commit_sha);
+  )(herokuBuild.source_blob.version, circleCIBuild.commit_sha);
 };
 
 /**
@@ -142,5 +142,5 @@ export const isDeployable = (bundle: Bundle): boolean =>
  */
 export const byQueuedAt = ord.contramap<Date, Bundle>(
   ordDate,
-  (bundle: Bundle) => new Date(bundle.codeshipBuild.queued_at || 0),
+  (bundle: Bundle) => new Date(bundle.circleCIBuild.queued_at || 0),
 );

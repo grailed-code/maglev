@@ -2,7 +2,7 @@
 
 _Safe, smooth, reliable, magnet-powered deployments._
 
-🚄 Maglev is an automated tool for regularly deploying code. It looks at the most recent green source branch builds in Codeship, compares them to the current slug on Heroku, and finds the best available code to deploy. After the deploy is started, it will post a message in Slack with a list of all of the commits it is deploying.
+🚄 Maglev is an automated tool for regularly deploying code. It looks at the most recent green source branch builds in CircleCI, compares them to the current slug on Heroku, and finds the best available code to deploy. After the deploy is started, it will post a message in Slack with a list of all of the commits it is deploying.
 
 ## Emergency Brake
 
@@ -26,7 +26,6 @@ yarn dev:run
 The following environment variables are expected to be set for `yarn dev:run` to work:
 
 - For CircleCI: `CIRCLECI_TOKEN`
-- For Codeship: `CODESHIP_USERNAME`, `CODESHIP_PASSWORD`, `CODESHIP_ORGANIZATION_ID`, `CODESHIP_PROJECT_ID`
 - For Heroku: `HEROKU_ACCESS_TOKEN`, `HEROKU_APP_NAME`
 - For Github: `GITHUB_OWNER`, `GITHUB_REPO`, `GITHUB_ACCESS_TOKEN`
 - For Slack: `SLACK_API_TOKEN`
@@ -59,7 +58,7 @@ Another excellent series to build good understanding is Giulio Canti's _Getting 
 
 Currently, 🚄 Maglev uses the following services to coordinate deploys:
 
-- [Codeship](https://apidocs.codeship.com/v2/introduction), for identifying which commits have successfully passed CI;
+- [CircleCI](https://circleci.com/docs/api/v2/index.html), for identifying which commits have successfully passed CI;
 - [Github](https://developer.github.com/v3/), for doing comparisons across commits and grabbing the code to be deployed;
 - [Heroku](https://devcenter.heroku.com/articles/platform-api-reference), as the destination for all deploys; and
 - [Slack](https://api.slack.com/), as the destination for all notifications.
