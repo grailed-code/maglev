@@ -79,7 +79,7 @@ const buildPairsToDeployBundles = flow(
  * Then, we pair that build with each of the given CircleCI builds.
  * Finally, we convert all of the CircleCI build / Heroku build pairs into deploy bundles.
  */
-const buildsToDeployBundles = (builds: Array<CircleCI.Build | CircleCI.Build>) =>
+const buildsToDeployBundles = (builds: Array<CircleCI.Build>) =>
   flow(
     Heroku.Build.getMostRecent,
     TaskEither.map((build) => zipFill([builds, build])),
