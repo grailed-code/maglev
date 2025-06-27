@@ -32,9 +32,9 @@ const commitRefBlock = (commit: Commit.CommitReference) =>
 // https://api.slack.com/reference/surfaces/formatting#escaping
 const escapeCommitMessage = (message: string) =>
   message
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
+    .replace("&lt;", "&amp;")
+    .replace("<", "&lt;")
+    .replace(">", "&gt;");
 
 const MAX_COMMIT_COUNT = 15;
 
