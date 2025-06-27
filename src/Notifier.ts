@@ -23,18 +23,9 @@ const commitRefBlock = (commit: Commit.CommitReference) =>
     text: [
       "📝",
       `${commit.author.login}`,
-      `<${commit.html_url}|${escapeCommitMessage(
-        commit.commit.message.split("\n")[0],
-      )}>`,
+      `<${commit.html_url}|${commit.commit.message.split("\n")[0]}>`,
     ].join(" "),
   });
-
-// https://api.slack.com/reference/surfaces/formatting#escaping
-const escapeCommitMessage = (message: string) =>
-  message
-    .replace("&lt;", "&amp;")
-    .replace("<", "&lt;")
-    .replace(">", "&gt;");
 
 const MAX_COMMIT_COUNT = 15;
 
